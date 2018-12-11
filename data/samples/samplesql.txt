@@ -1,0 +1,65 @@
+$sql = "INSERT INTO `mx_user`(`DATA`) VALUES (\n"
+
+    . "\'{\n"
+
+    . "      \"mx_id\": \"\",\n"
+
+    . "      \"name\": \"Elyte\",\n"
+
+    . "      \"type\": \"artist\",\n"
+
+    . "      \"owner\": \"Musixplay\",\n"
+
+    . "      \"aboutMe\": \"\",\n"
+
+    . "      \"status\":\"\",\n"
+
+    . "      \"avatar\": \"\",\n"
+
+    . "      \"city\": \"\",\n"
+
+    . "      \"country\": \"\",\n"
+
+    . "      \"dateOfBirth\": \"\",\n"
+
+    . "      \"displayName\": \"\",\n"
+
+    . "      \"distanceUnit\": \"\",\n"
+
+    . "      \"encodedId\": \"\",\n"
+
+    . "      \"fullName\": \"\",\n"
+
+    . "      \"firstName\": \"\",\n"
+
+    . "      \"lastName\": \"\",\n"
+
+    . "      \"email\": \"\",\n"
+
+    . "      \"gender\": \"\",\n"
+
+    . "      \"height\": 0,\n"
+
+    . "      \"locale\": \"\",\n"
+
+    . "      \"memberSince\": \"\",\n"
+
+    . "      \"state\": \"\",\n"
+
+    . "      \"accountType\": \"\",\n"
+
+    . "      \"verified\": true,\n"
+
+    . "      \"phone\": \"\",\n"
+
+    . "      \"subscription\": [],\n"
+
+    . "      \"connectIp\": \"\",\n"
+
+    . "      \"myArtists\": [],\n"
+
+    . "      \"myLikes\": []\n"
+
+    . "    }\'\n"
+
+    . ")";

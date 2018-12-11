@@ -1,0 +1,14 @@
+{
+    "require": {
+        "slim/slim": "3.0",
+        "slim/php-view": "^2.0",
+        "monolog/monolog": "^1.24",
+        "robmorgan/phinx": "^0.5.1",
+        "slim/pdo": "^1.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "": "classes/"
+        }
+    }
+}
