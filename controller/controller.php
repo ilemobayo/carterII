@@ -1,11 +1,6 @@
 <?php
 ini_set('display_errors','on');
 
-$app->get('/v1/hello/{name}', function($request, $response, $args) {
-    $this->logger->addInfo('Something interesting happened');
-  return $response->getBody()->write("Hello, ". $args['name']);
-});
-
 $app->get('/v1/fetch/userdata/{id}',function($request, $response, $args) {
 	$id = $args["id"];
     // $sql = 'SELECT * from mxp_user where id='.$id;
@@ -66,32 +61,8 @@ $app->get('/v1/login',function() use($app) {
 });
 
 
-$app->get('/v1/getAll', function($request, $response, $args) {
-    $key = keygen_one(49);
-    $jwt = getJWT ('bayoKings');
-    return $response -> write("all list <br/> with key: " . $key . "<br/> JWT: " . $jwt);
-});
-
-$app->get('/v1/getByName/{name}', function($request, $response, $args) {
-    $name = $args['name'];
-    return $response -> write("get tracks by name: ". $name);
-});
-
-$app->post('/v1/create', function($request, $response, $args) {
-    return $response -> write("create new user");
-});
-
-$app->put('/v1/update/{id}', function($request, $response, $args) {
-    $id = $args['id'];
-    return $response -> write("update user by id: ". $id);
-});
-
-$app->delete('/v1/delete/{id}', function($request, $response, $args) {
-    $id = $args['id'];
-    return $response -> write("update user by id: ". $id);
-});
-
 //ARTIST
+//create new artist
 $app->post('/v1/create/artist/{id}', function($request, $response, $args) {
     $id = $args['id'];
     $name = $request->getParsedBody()["name"];
@@ -127,9 +98,18 @@ $app->post('/v1/create/artist/{id}', function($request, $response, $args) {
     }
 });
 
+// get all artists
+$app->get('/v1/getArtists', function ($request, $response, $args) {
+    $sth = $this->db->prepare("SELECT * FROM orin_artist ORDER BY id");
+    $sth->execute();
+    $artists = $sth->fetchAll();
+    return $this->response->withJson($artists);
+});
+
 
 
 //TRACKS
+//create new track
 $app->post('/v1/create/track/{id}', function($request, $response, $args) {
     $id = $args['id'];
     $name = $request->getParsedBody()["name"];
@@ -141,6 +121,7 @@ $app->post('/v1/create/track/{id}', function($request, $response, $args) {
     $des = $request->getParsedBody()["des"];
     $active = $request->getParsedBody()["active"];
     if (($name != null) && ($label != null) && ($des != null) && ($cover != null)) {
+        $input = $request->getParsedBody();
         // INSERT INTO orin_artist ( id , name , label, des, cover ) VALUES ( ? , ? , ? )
         $sth = $this->db->prepare('INSERT INTO orin_track (name,artist_id,cover,year,label,type,des,active) VALUES(:name,:artist_id,:cover,:year,:label,:type,:des,:active)');
         $sth->bindValue("name", $name, PDO::PARAM_STR);
@@ -152,7 +133,9 @@ $app->post('/v1/create/track/{id}', function($request, $response, $args) {
         $sth->bindParam("des", $des, PDO::PARAM_STR);
         $sth->bindParam("active", $active);
         if ($sth->execute()) {
-            return $response -> write("Track created successfully.");
+            //return $response -> write("Track created successfully.");
+            $input['id'] = $this->db->lastInsertId();
+            return $this->response->withJson($input);
         } else {
             return json_encode(array(
                 "error" => 99,
@@ -170,6 +153,60 @@ $app->post('/v1/create/track/{id}', function($request, $response, $args) {
         //return $response -> write("Your request format is incorrect!");
     }
 });
+
+// get all tracks
+$app->get('/v1/getTracks', function ($request, $response, $args) {
+    $sth = $this->db->prepare("SELECT * FROM orin_track ORDER BY id");
+    $sth->execute();
+    $tracks = $sth->fetchAll();
+    return $this->response->withJson($tracks);
+});
+
+// Retrieve track with id 
+$app->get('/v1/getTrack/[{id}]', function ($request, $response, $args) {
+    $sth = $this->db->prepare("SELECT * FROM orin_track WHERE id=:id");
+   $sth->bindParam("id", $args['id']);
+   $sth->execute();
+   $track = $sth->fetchObject();
+   return $this->response->withJson($track);
+});
+
+// Search for todo with given search teram in their name
+$app->get('/v1/track/search/[{query}]', function ($request, $response, $args) {
+    $sth = $this->db->prepare("SELECT * FROM orin_track WHERE UPPER(name) LIKE :query ORDER BY name");
+    $query = "%".$args['query']."%";
+    $sth->bindParam("query", $query);
+    $sth->execute();
+    $tracks = $sth->fetchAll();
+    return $this->response->withJson($tracks);
+});
+
+// Update track with given id
+$app->put('/v1/track/update/[{id}]', function ($request, $response, $args) {
+    $input = $request->getParsedBody();
+    $sql = "UPDATE orin_track SET name=:name,artist_id=:artist_id,cover=:cover,year=:year,label=:label,type=:type,des=:des,active=:active  WHERE id=:id";
+     $sth = $this->db->prepare($sql);
+    $sth->bindParam("id", $args['id']);
+    $sth->bindValue("name", $input['name'], PDO::PARAM_STR);
+    $sth->bindParam("artist_id", $input['artist_id'], PDO::PARAM_STR);
+    $sth->bindParam("cover", $input['cover'], PDO::PARAM_STR);
+    $sth->bindValue("year", $input['year'], PDO::PARAM_STR);
+    $sth->bindParam("label", $input['label'], PDO::PARAM_STR);
+    $sth->bindParam("type", $input['type']);
+    $sth->bindParam("des", $input['des'], PDO::PARAM_STR);
+    $sth->bindParam("active", $input['active']);
+    $sth->execute();
+    $input['id'] = $args['id'];
+    return $this->response->withJson($input);
+});
+
+
+
+
+
+
+
+
 
 //ALBUM
 $app->post('/v1/create/album/{id}', function($request, $response, $args) {

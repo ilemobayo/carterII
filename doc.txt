@@ -1,0 +1,3 @@
+$ php composer.phar create-project slim/slim-skeleton [my-app-name]
+(or) 
+$ composer create-project slim/slim-skeleton [my-app-name]
